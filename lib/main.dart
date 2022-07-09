@@ -50,6 +50,14 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    List<MyButton> buttons = [];
+    for (var i = 1; i < 10; i++) {
+      buttons.add(
+          MyButton(i.toString(), onPressed: () => appendToText(i.toString())));
+    }
+    buttons.add(MyButton('c', onPressed: () => clearText()));
+    buttons.add(MyButton('+', onPressed: () => appendToText('+')));
+    buttons.add(MyButton('=', onPressed: () => calculateResult()));
     return Scaffold(
       appBar: AppBar(title: Text('My Calculator')),
       body: Center(
@@ -65,15 +73,8 @@ class _MyAppState extends State<MyApp> {
                 ),
               ),
             ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                MyButton('1', onPressed: () => appendToText('1')),
-                MyButton('2', onPressed: () => appendToText('2')),
-                MyButton('+', onPressed: () => appendToText('+')),
-                MyButton('c', onPressed: () => clearText()),
-                MyButton('=', onPressed: () => calculateResult()),
-              ],
+            Wrap(
+              children: buttons,
             ),
           ],
         ),
