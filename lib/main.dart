@@ -1,108 +1,98 @@
 import 'package:flutter/material.dart';
+import 'package:math_expressions/math_expressions.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MaterialApp(
+    home: MyApp(),
+    debugShowCheckedModeBanner: false,
+  ));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
+class MyApp extends StatefulWidget {
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter is being fun',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      home: const MyHomePage(),
-    );
-  }
+  State<MyApp> createState() => _MyAppState();
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key}) : super(key: key);
+class _MyAppState extends State<MyApp> {
+  String text = '';
+  static Parser parser = Parser();
 
-  @override
-  State<StatefulWidget> createState() {
-    return MyHomePageState();
+  void appendToText(String s) {
+    setState(() {
+      text += s;
+    });
   }
-}
 
-class MyHomePageState extends State<MyHomePage> {
-  List<Widget> _children = [];
+  void clearText() {
+    setState(() {
+      text = '';
+    });
+  }
 
-  int idx = 0;
+  void updateText(String s) {
+    setState(() {
+      text = s;
+    });
+  }
+
+  /// evaluate the result of text and update text with result
+  void calculateResult() {
+    double result =
+        parser.parse(text).evaluate(EvaluationType.REAL, ContextModel());
+    print(result);
+    updateText(result.toInt().toString());
+  }
 
   @override
   void initState() {
     super.initState();
-    _children = [
-      MyButton(),
-      ElevatedButton(child: Text("Button $idx"), onPressed: () {}),
-      ElevatedButton(child: Text("Button {$idx+1}"), onPressed: () {}),
-    ];
-    idx++;
-  }
-
-  void someActions() {
-    Widget w = _children[0];
-    print("Hello World");
-  }
-
-  void addChildHandler() {
-    idx++;
-    setState(() {
-      var newChild = ElevatedButton(
-        child: Text("Button $idx"),
-        onPressed: someActions,
-      );
-      _children.add(newChild);
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    // ignore: unnecessary_null_comparison
-    _children = _children == null ? [] : List.from(_children);
-
     return Scaffold(
-      appBar: AppBar(title: const Text('Flutter Column Example')),
-      body: Center(child: Column(children: _children)),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: addChildHandler,
+      appBar: AppBar(title: Text('My Calculator')),
+      body: Center(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Text(
+                text,
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                MyButton('1', onPressed: () => appendToText('1')),
+                MyButton('2', onPressed: () => appendToText('2')),
+                MyButton('+', onPressed: () => appendToText('+')),
+                MyButton('c', onPressed: () => clearText()),
+                MyButton('=', onPressed: () => calculateResult()),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
-class MyButton extends StatefulWidget {
-  @override
-  State<MyButton> createState() => _MyButtonState();
-}
+class MyButton extends StatelessWidget {
+  final String value;
+  final Function()? onPressed;
 
-class _MyButtonState extends State<MyButton> {
-  int num = 0;
-  String s = 'Button';
-  double _height = 50;
+  MyButton(this.value, {required this.onPressed});
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: _height,
-      child: ElevatedButton(
-        onPressed: () {
-          print('hi');
-          setState(() {
-            num++;
-            s = 'hello';
-            _height += 10;
-          });
-        },
-        child: Text(s),
-      ),
+    return ElevatedButton(
+      onPressed: onPressed,
+      child: Text(value),
     );
   }
 }
